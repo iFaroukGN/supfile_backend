@@ -5,8 +5,10 @@ import org.supinf.entities.User;
 import org.supinf.service.IUserService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.supinf.config.JwtWebSecurityConfigurerAdapter;
 
 /**
  *
@@ -60,6 +62,15 @@ public class UserService implements IUserService {
     @Override
     public void delete(User user) {
         userRepository.delete(user);
+    }
+
+    /**
+     *
+     * @param email
+     * @return
+     */
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
 }

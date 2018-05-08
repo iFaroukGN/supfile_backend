@@ -46,4 +46,12 @@ public interface IUserService {
      * @param user
      */
     public void delete(User user);
+    
+    /**
+     * Retrouver un utilisateur grâce à son mail
+     *
+     * @param email
+     * @return l'entité recherchée
+     */
+    public User findByEmail(String email);
 }

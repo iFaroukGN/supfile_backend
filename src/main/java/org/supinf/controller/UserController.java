@@ -5,6 +5,7 @@ import org.supinf.service.IUserService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.supinf.webapi.UserResponse;
 
 /**
  * Classe controlleur
@@ -22,7 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-
+    
+    
+    /**
+     * injection instance BCryptPasswordEncoder
+     *
+     * @see JwtWebSecurityConfigurerAdapter#bCryptPasswordEncoder()
+     */
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+    
     /**
      * Injection d'une instance de IUserService
      */
@@ -33,11 +44,18 @@ public class UserController {
      * Méthode définissant une ressource REST permettant de créer un utilisateur
      *
      * @param user
-     * @return
+     * @return l'identifiant de l'utilisateur créé
      */
     @PostMapping("/")
-    public ResponseEntity<User> save(@RequestBody User user) {
-        return ResponseEntity.ok(userService.save(user));
+    public ResponseEntity<UserResponse> save(@RequestBody User user) {
+        //On chiffre le mot de passe avant de l'enregistrer
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        //on construit une instance de réponse
+        UserResponse response = new UserResponse();
+        //on récupère les informations à envoyer
+        response.setId(userService.save(user).getId());
+        //
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -60,6 +78,9 @@ public class UserController {
      */
     @PutMapping("/")
     public ResponseEntity<User> update(@RequestBody User user) {
+        //On chiffre le mot de passe avant de l'enregistrer
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        
         return ResponseEntity.ok(userService.update(user));
     }
 
