@@ -19,5 +19,5 @@ public interface IAuthenticationService {
      * @param password
      * @return 
      */
-    public Authentication authenticate(Object username, Object password);
+    public Object authenticate(Object username, Object password);
 }

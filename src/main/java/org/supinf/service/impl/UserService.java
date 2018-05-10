@@ -65,12 +65,17 @@ public class UserService implements IUserService {
     }
 
     /**
-     *
-     * @param email
-     * @return
+     * @see IUserService#findByEmail(java.lang.String) 
      */
     public User findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    /**
+     * @see IUserService#findByFacebookEmail(java.lang.String) 
+     */
+    public User findByFacebookEmail(String facebookEmail) {
+        return userRepository.findByFacebookEmail(facebookEmail);
     }
 
 }

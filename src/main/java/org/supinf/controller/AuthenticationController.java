@@ -37,7 +37,7 @@ import org.supinf.webapi.AuthenticationResponse;
 public class AuthenticationController {
 
     @Autowired
-    @Qualifier("defaultAuthenticationService")
+    @Qualifier("jwtAuthenticationService")
     IAuthenticationService authenticationService;
 
     /**
@@ -59,13 +59,13 @@ public class AuthenticationController {
             String password = authenticationRequest.getPassword();
 
             // authentification
-            authenticationService.authenticate(email, password);
+            String token = (String)authenticationService.authenticate(email, password);
             
             
             //on verifie que l'authetification s'est bien passée en allant chercher les informations dans le contexte de sécurité
-            String authenticatedUsername = ((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+            //String authenticatedUsername = ((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
             //
-            response.setToken(authenticatedUsername);
+            response.setToken(token);
             
 
 

@@ -2,6 +2,7 @@ package org.supinf.service;
 
 import org.supinf.entities.User;
 import java.util.List;
+import org.supinf.dao.UserRepository;
 
 /**
  *
@@ -46,12 +47,14 @@ public interface IUserService {
      * @param user
      */
     public void delete(User user);
-    
+
     /**
-     * Retrouver un utilisateur grâce à son mail
-     *
-     * @param email
-     * @return l'entité recherchée
+     * @see UserRepository#findByEmail(java.lang.String)
      */
     public User findByEmail(String email);
+
+    /**
+     * @see UserRepository#findByFacebookEmail(java.lang.String)
+     */
+    public User findByFacebookEmail(String facebookEmail);
 }

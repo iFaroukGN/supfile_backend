@@ -8,16 +8,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.supinf.entities.User;
-import org.supinf.security.AbstractUserDetails;
 
 /**
  * Classe permettant de fournir au contexte de sécurité un utilisateur recherché
- * grâce à son email par défaut
+ * grâce à son email Facebook
  *
  * @author BLU Kwensy Eli
  */
 @Component
-public class DefaultUserDetailsService extends AbstractUserDetailsService {
+public class FacebookUserDetailsService extends AbstractUserDetailsService {
 
     @Autowired
     UserService userService;
@@ -25,7 +24,7 @@ public class DefaultUserDetailsService extends AbstractUserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         //utilisteur dans la base de données
-        User dataSourceUser = userService.findByEmail(email);
+        User dataSourceUser = userService.findByFacebookEmail(email);
         /**
          * sil'utilisateur n'existe pas
          */
@@ -33,11 +32,10 @@ public class DefaultUserDetailsService extends AbstractUserDetailsService {
             throw new UsernameNotFoundException(email);
         }
 
-        // on retourne un utilisateur comme défini par Spring Security c'est-à-dire une implémentation de l'interface UserDetails
-        return new AbstractUserDetails(
-                dataSourceUser.getId(),
-                dataSourceUser.getEmail(),
-                dataSourceUser.getPassword(),
+        // on retourne un utilisateur comme défini par Spring Security
+        return new org.springframework.security.core.userdetails.User(
+                email,
+                null,
                 Collections.EMPTY_LIST);
     }
 }

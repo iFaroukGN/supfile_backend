@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.supinf.service.impl.DefaultUserDetailsService;
 
 /**
@@ -63,6 +66,19 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
     }
 
     /**
+     * 
+     * Exposer ce bean pour la configuration du support CORS 
+     * @return
+     */
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // On autorise toutes les requetes entrantes
+        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        return source;
+    }
+
+    /**
      * Configuration de la sécurité HTTP
      *
      * @param http
@@ -71,7 +87,7 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-//                .cors() // activation du support CORS
+                .cors().and() // activation du support CORS
                 .formLogin().disable() // désactivation du formulaire de connexion par défaut
                 .csrf().disable() // désactivation dela protection CSRF
                 .httpBasic().disable() // désactivation de l'authentification basique
