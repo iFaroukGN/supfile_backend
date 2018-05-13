@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -26,10 +27,22 @@ import org.supinf.service.impl.DefaultUserDetailsService;
 public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
     /**
+     * Injection instance jwtAuthenticationEntryPoint
+     */
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    /**
+     * Injection instance jwtAuthorizationFilter
+     */
+    @Autowired
+    private JwtAuthorizationFilter jwtAuthorizationFilter;
+
+    /**
      * Injection instance userDefaultService
      */
     @Autowired
-    DefaultUserDetailsService defaultUserDetailsService;
+    private DefaultUserDetailsService defaultUserDetailsService;
 
     /**
      * @see WebSecurityConfigurerAdapter#authenticationManagerBean()
@@ -66,8 +79,9 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
     }
 
     /**
-     * 
-     * Exposer ce bean pour la configuration du support CORS 
+     *
+     * Exposer ce bean pour la configuration du support CORS
+     *
      * @return
      */
     @Bean
@@ -87,9 +101,11 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
+        http
                 .cors().and() // activation du support CORS
                 .formLogin().disable() // désactivation du formulaire de connexion par défaut
-                .csrf().disable() // désactivation dela protection CSRF
+                .csrf().disable() // désactivation de la protection CSRF
                 .httpBasic().disable() // désactivation de l'authentification basique
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/auth/login/**").permitAll() // on autorise uniquement les requetes POST pour l'URL indiquée
@@ -97,6 +113,8 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
                 .anyRequest() // pour toutes les autres URLs ...
                 .authenticated() // ... une authentification requise
                 .and()
+                // on configure le filtre pour l'autorisation JWT
+                .addFilterBefore(jwtAuthorizationFilter, AnonymousAuthenticationFilter.class)
                 // désactivation de la creation de session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 

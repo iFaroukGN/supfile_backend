@@ -20,7 +20,7 @@ import org.supinf.security.AbstractUserDetails;
 public class DefaultUserDetailsService extends AbstractUserDetailsService {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
