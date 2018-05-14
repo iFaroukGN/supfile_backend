@@ -1,5 +1,7 @@
 package org.supinf.config;
 
+import org.supinf.security.JwtAuthenticationEntryPoint;
+import org.supinf.security.JwtAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +17,7 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.supinf.service.impl.DefaultUserDetailsService;
+import org.supinf.security.service.DefaultUserDetailsService;
 
 /**
  * Classe de configuration pour la sécurité

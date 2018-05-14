@@ -1,5 +1,5 @@
 
-package org.supinf.service.impl;
+package org.supinf.security.service;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
 

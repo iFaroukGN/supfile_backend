@@ -1,4 +1,4 @@
-package org.supinf.config;
+package org.supinf.security;
 
 import java.io.IOException;
 import javax.servlet.FilterChain;
@@ -12,8 +12,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import org.supinf.security.AbstractUserDetails;
-import org.supinf.security.JwtUtils;
 
 /**
  *
