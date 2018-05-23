@@ -73,6 +73,23 @@
             <version>0.9.0</version>
         </dependency>
 
+        <!--swagger--> 
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.3.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.3.0</version>
+        </dependency>
     </dependencies>
     
     <build>
@@ -89,6 +106,52 @@
                 <configuration>
                     <skipTests>true</skipTests>
                 </configuration>
+            </plugin>
+            <!--swagger-->
+            <!--https://github.com/kongchen/swagger-maven-plugin-->
+            <plugin>
+                <groupId>com.github.kongchen</groupId>
+                <artifactId>swagger-maven-plugin</artifactId>
+                <version>3.1.7</version>
+                <executions>
+                    <execution>
+                        <id>generate</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <apiSources>
+                        <apiSource>
+                            <springmvc>true</springmvc>
+                            <locations>
+                                <location>org.supinf.controller</location>
+                            </locations>
+                            <schemes>
+                                <scheme>http</scheme>
+                            </schemes>
+                            <host>localhost</host>
+                            <basePath>/</basePath>
+                            <info>
+                                <title>Supfile backend</title>
+                                <version>v1</version>
+                            </info>
+                            <outputFormats>json</outputFormats>
+                            <swaggerDirectory>${project.build.directory}/swagger</swaggerDirectory>
+                        </apiSource>
+                    </apiSources>
+                </configuration>
+                <dependencies>
+                    <!-- Adding dependency to swagger-hibernate-validations to enable the BeanValidator as a custom
+                    model converter -->
+                    <dependency>
+                        <groupId>io.swagger</groupId>
+                        <artifactId>swagger-hibernate-validations</artifactId>
+                        <version>1.5.6</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

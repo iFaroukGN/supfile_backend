@@ -46,7 +46,7 @@ public class UserController {
      * @param user
      * @return l'identifiant de l'utilisateur créé
      */
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<UserResponse> save(@RequestBody User user) {
         //On chiffre le mot de passe avant de l'enregistrer
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
@@ -76,7 +76,7 @@ public class UserController {
      * @param user
      * @return
      */
-    @PutMapping("/")
+    @PutMapping
     public ResponseEntity<User> update(@RequestBody User user) {
         //On chiffre le mot de passe avant de l'enregistrer
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
@@ -89,7 +89,7 @@ public class UserController {
      *
      * @return La liste des utilisateurs
      */
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<User>> findAll() {
         return ResponseEntity.ok(userService.findAll());
     }

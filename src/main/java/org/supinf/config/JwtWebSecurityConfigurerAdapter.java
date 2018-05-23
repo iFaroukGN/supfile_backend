@@ -111,7 +111,8 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
                 .httpBasic().disable() // désactivation de l'authentification basique
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/auth/login/**").permitAll() // on autorise uniquement les requetes POST pour l'URL indiquée
-                .antMatchers(HttpMethod.POST, "/users/").permitAll()
+                .antMatchers(HttpMethod.POST, "/users").permitAll()
+                .antMatchers("/swagger-ui.html**", "/webjars/**", "/swagger-resources", "/configuration/**", "/v2/api-docs").permitAll()
                 .anyRequest() // pour toutes les autres URLs ...
                 .authenticated() // ... une authentification requise
                 .and()
