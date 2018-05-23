@@ -15,44 +15,51 @@ import lombok.NoArgsConstructor;
 
 /**
  * Classe représentant un utilisateur
+ *
  * @author Supfile
  */
 @Entity
 @Data
 @NoArgsConstructor
 public class User {
+
     /**
      * Identifiant en base de données
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     /**
-     *adresse mail par défaut
+     * adresse mail par défaut
      */
-    @Column(unique=true, nullable = true)
+    @Column(unique = true, nullable = true)
     private String email;
-    
+
     /**
-     *adresse mail facebook
+     * adresse mail facebook
      */
-    @Column(unique=true, nullable = true)
+    @Column(unique = true, nullable = true)
     private String facebookEmail;
     /**
      * Mot de passe d'authentification
      */
     private String password;
-    
+    /**
+     * Mot de passe d'authentification
+     */
+    private String username;
+
     /**
      * Constructeur avec arguments
+     *
      * @param email
      * @param facebookEmail
-     * @param password 
+     * @param password
      */
-    public User (String email, String facebookEmail, String password){
-        this.email=email;
-        this.facebookEmail=facebookEmail;
-        this.password=password;
+    public User(String email, String facebookEmail, String password) {
+        this.email = email;
+        this.facebookEmail = facebookEmail;
+        this.password = password;
     }
 }

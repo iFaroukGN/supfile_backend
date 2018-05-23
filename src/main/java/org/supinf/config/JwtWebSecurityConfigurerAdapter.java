@@ -112,7 +112,8 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/auth/login/**").permitAll() // on autorise uniquement les requetes POST pour l'URL indiquée
                 .antMatchers(HttpMethod.POST, "/users").permitAll()
-                .antMatchers("/swagger-ui.html**", "/webjars/**", "/swagger-resources", "/configuration/**", "/v2/api-docs").permitAll()
+                .antMatchers("/swagger-ui.html**", "/webjars/**", "/swagger-resources", "/configuration/**", "/v2/api-docs").permitAll() //Swagger
+                .antMatchers("/h2/**").permitAll() // Configuration H2
                 .anyRequest() // pour toutes les autres URLs ...
                 .authenticated() // ... une authentification requise
                 .and()
