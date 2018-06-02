@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.supinf.entities;
 
 import javax.persistence.Column;
@@ -42,11 +37,16 @@ public class User {
     @Column(unique = true, nullable = true)
     private String facebookEmail;
     /**
+     * adresse mail google
+     */
+    @Column(unique = true, nullable = true)
+    private String googleEmail;
+    /**
      * Mot de passe d'authentification
      */
     private String password;
     /**
-     * Mot de passe d'authentification
+     * nom d'utilisateur
      */
     private String username;
 
@@ -55,11 +55,15 @@ public class User {
      *
      * @param email
      * @param facebookEmail
+     * @param googleEmail
      * @param password
+     * @param username
      */
-    public User(String email, String facebookEmail, String password) {
+    public User(String email, String facebookEmail, String googleEmail, String password, String username) {
         this.email = email;
         this.facebookEmail = facebookEmail;
+        this.googleEmail = googleEmail;
         this.password = password;
+        this.username = username;
     }
 }
