@@ -1,6 +1,9 @@
 package org.supinf.io.storage;
 
 import org.springframework.stereotype.Component;
+import org.supinf.entities.FileResource;
+import org.supinf.entities.FolderResource;
+import org.supinf.entities.Resource;
 
 /**
  * Classe pour interagir avec le système de fichiers local
