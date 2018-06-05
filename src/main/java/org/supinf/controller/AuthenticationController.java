@@ -5,6 +5,7 @@
  */
 package org.supinf.controller;
 
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.supinf.service.IAuthenticationService;
 import org.supinf.webapi.AuthenticationRequest;
 import org.supinf.webapi.AuthenticationResponse;
+import org.supinf.entities.projection.UserWithoutPassword;
 
 /**
  *
@@ -49,15 +51,15 @@ public class AuthenticationController {
             String password = authenticationRequest.getPassword();
 
             // authentification
-            String token = (String)authenticationService.authenticate(email, password);
-            
-            
+            Pair<Long, String> authenticatedObject = (Pair<Long, String>) authenticationService.authenticate(email, password);
+            String token = authenticatedObject.getValue();
+            Long id = authenticatedObject.getKey();
+
             //on verifie que l'authetification s'est bien passée en allant chercher les informations dans le contexte de sécurité
             //String authenticatedUsername = ((UserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
             //
             response.setToken(token);
-            
-
+            response.setId(id);
 
             // On renvoie la réponse
             return ResponseEntity.ok(response);
@@ -73,6 +75,15 @@ public class AuthenticationController {
      */
     @GetMapping("/logout")
     public void logout() {
+    }
+
+    /**
+     *
+     * Url permettant de se déconnecter
+     */
+    @GetMapping("/loggeduser")
+    public ResponseEntity<UserWithoutPassword> loggedUser() {
+        return ResponseEntity.ok(authenticationService.getAuthenticatedUser());
     }
 
 }

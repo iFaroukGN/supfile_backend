@@ -1,18 +1,22 @@
 package org.supinf.io.storage;
 
+import java.io.File;
+import java.io.IOException;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 import org.supinf.entities.FileResource;
 import org.supinf.entities.FolderResource;
 import org.supinf.entities.Resource;
+import org.supinf.entities.User;
 
 /**
  * Classe pour interagir avec le système de fichiers local
  *
  * @author BLU Kwensy Eli
- * 
+ *
  */
 @Component
-public class LocalFileSystemIoHandler implements StorageAccessProvider {
+public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
 
     @Override
     public void createResource(Resource resource) {
@@ -20,8 +24,10 @@ public class LocalFileSystemIoHandler implements StorageAccessProvider {
     }
 
     @Override
-    public void createFile(FileResource fileResource) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void createFile(FileResource fileResource, Object originalFile) throws IOException {
+        MultipartFile file = (MultipartFile) originalFile;
+        File destination = new File(getStorageRootPath(), file.getOriginalFilename());
+        file.transferTo(destination);
     }
 
     @Override
@@ -42,6 +48,22 @@ public class LocalFileSystemIoHandler implements StorageAccessProvider {
     @Override
     public void renameResource(Resource resource, String name) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void createRootFolder() {
+        File rootFolder = new File(getStorageRootPath());
+        if (!rootFolder.exists()) {
+            rootFolder.mkdir();
+        }
+    }
+
+    @Override
+    public void initUserStorageSpace(User user) {
+        File userStorageSpace = new File(getStorageRootPath(), String.valueOf(user.getId()));
+        if(!userStorageSpace.exists()){
+            userStorageSpace.mkdir();
+        }
     }
 
 }

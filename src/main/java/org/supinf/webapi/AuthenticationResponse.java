@@ -15,12 +15,41 @@ public class AuthenticationResponse {
      */
     protected String token;
 
+    /**
+     * l'identifiant de l'utilisateur connecté
+     */
+    protected Long id;
+
+    /**
+     *
+     * @return
+     */
     public String getToken() {
         return token;
     }
 
+    /**
+     *
+     * @param token
+     */
     public void setToken(String token) {
         this.token = token;
+    }
+
+    /**
+     * 
+     * @return 
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * 
+     * @param id 
+     */
+    public void setId(Long id) {
+        this.id = id;
     }
 
 }

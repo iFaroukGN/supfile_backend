@@ -4,6 +4,7 @@ import org.supinf.entities.User;
 import org.supinf.service.IUserService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.supinf.io.storage.AbstractStorageAccessProvider;
 import org.supinf.webapi.UserResponse;
 
 /**
@@ -24,8 +26,14 @@ import org.supinf.webapi.UserResponse;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    
-    
+
+    /**
+     * injection instance StorageAccessProvider
+     */
+    @Autowired
+    @Qualifier("localFileSystemIoHandler")
+    AbstractStorageAccessProvider storageAccess;
+
     /**
      * injection instance BCryptPasswordEncoder
      *
@@ -33,7 +41,7 @@ public class UserController {
      */
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
-    
+
     /**
      * Injection d'une instance de IUserService
      */
@@ -54,13 +62,16 @@ public class UserController {
         UserResponse response = new UserResponse();
         //on récupère les informations à envoyer
         response.setId(userService.save(user).getId());
-        //
+
+        //initialisation de l'espace de stockage de l'utilisateur
+        storageAccess.initUserStorageSpace(user);
+
         return ResponseEntity.ok(response);
     }
 
     /**
-     * Méthode définissant une ressource REST permettant de retrouver un utilisateur
-     * grâce à son identifiant
+     * Méthode définissant une ressource REST permettant de retrouver un
+     * utilisateur grâce à son identifiant
      *
      * @param id
      * @return
@@ -71,7 +82,8 @@ public class UserController {
     }
 
     /**
-     * Méthode définissant une ressource REST permettant de modifier un utilisateur
+     * Méthode définissant une ressource REST permettant de modifier un
+     * utilisateur
      *
      * @param user
      * @return
@@ -80,12 +92,13 @@ public class UserController {
     public ResponseEntity<User> update(@RequestBody User user) {
         //On chiffre le mot de passe avant de l'enregistrer
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        
+
         return ResponseEntity.ok(userService.update(user));
     }
 
     /**
-     * Méthode définissant une ressource REST permettant de retrouver la liste de tous les utilisateurs
+     * Méthode définissant une ressource REST permettant de retrouver la liste
+     * de tous les utilisateurs
      *
      * @return La liste des utilisateurs
      */
@@ -95,7 +108,8 @@ public class UserController {
     }
 
     /**
-     * Méthode définissant une ressource REST permettant de supprimer un utilisateur
+     * Méthode définissant une ressource REST permettant de supprimer un
+     * utilisateur
      *
      * @param id
      * @return

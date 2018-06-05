@@ -3,6 +3,7 @@ package org.supinf.service;
 import org.supinf.entities.User;
 import java.util.List;
 import org.supinf.dao.UserRepository;
+import org.supinf.entities.projection.UserWithoutPassword;
 
 /**
  *

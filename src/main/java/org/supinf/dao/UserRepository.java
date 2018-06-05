@@ -2,6 +2,7 @@ package org.supinf.dao;
 
 import org.supinf.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.supinf.entities.projection.UserWithoutPassword;
 
 /**
  *
