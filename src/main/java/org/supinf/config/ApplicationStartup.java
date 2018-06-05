@@ -26,7 +26,6 @@ public class ApplicationStartup
      */
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
-        System.out.println("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww");
         storageAccess.createRootFolder();
     }
 
