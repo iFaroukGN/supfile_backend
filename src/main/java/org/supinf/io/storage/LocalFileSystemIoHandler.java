@@ -9,6 +9,7 @@ import org.supinf.entities.Resource;
  * Classe pour interagir avec le système de fichiers local
  *
  * @author BLU Kwensy Eli
+ * 
  */
 @Component
 public class LocalFileSystemIoHandler implements StorageAccessProvider {

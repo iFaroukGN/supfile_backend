@@ -121,6 +121,8 @@ public class JwtWebSecurityConfigurerAdapter extends WebSecurityConfigurerAdapte
                 .addFilterBefore(jwtAuthorizationFilter, AnonymousAuthenticationFilter.class)
                 // désactivation de la creation de session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        
+        http.headers().frameOptions().disable(); // h2
 
     }
 
