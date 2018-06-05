@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.supinf.entities.FileResource;
 import org.supinf.entities.FolderResource;
 import org.supinf.entities.Resource;
+import org.supinf.entities.User;
 
 /**
  * Classe pour interagir avec le système de fichiers local
@@ -25,7 +26,7 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
     @Override
     public void createFile(FileResource fileResource, Object originalFile) throws IOException {
         MultipartFile file = (MultipartFile) originalFile;
-        File destination = new File(getStorageRootPath() + file.getOriginalFilename());
+        File destination = new File(getStorageRootPath(), file.getOriginalFilename());
         file.transferTo(destination);
     }
 
@@ -56,4 +57,13 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
             rootFolder.mkdir();
         }
     }
+
+    @Override
+    public void initUserStorageSpace(User user) {
+        File userStorageSpace = new File(getStorageRootPath(), String.valueOf(user.getId()));
+        if(!userStorageSpace.exists()){
+            userStorageSpace.mkdir();
+        }
+    }
+
 }

@@ -3,6 +3,7 @@ package org.supinf.io.storage;
 import org.supinf.entities.FileResource;
 import org.supinf.entities.FolderResource;
 import org.supinf.entities.Resource;
+import org.supinf.entities.User;
 
 /**
  * CEtte interface fournit les fonctionnalités permettant d'interagir avec un
@@ -54,5 +55,10 @@ public interface StorageAccessProvider {
      * Cette méthode permet de creer le répertoire racine
      */
     public void createRootFolder();
+    
+    /**
+     * initialiser l'espace de stockage de l'utilisateur
+     */
+    public void initUserStorageSpace(User user);
 
 }

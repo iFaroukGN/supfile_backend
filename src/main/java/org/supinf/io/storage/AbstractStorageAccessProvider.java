@@ -12,6 +12,7 @@ import org.springframework.core.env.Environment;
  */
 public abstract class AbstractStorageAccessProvider implements StorageAccessProvider {
 
+    
 //    @Autowired
 //    private Environment env;
     //Le répertoire de racine du sysème de stockage
