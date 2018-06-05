@@ -5,6 +5,7 @@
  */
 package org.supinf.service.impl;
 
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,7 +39,8 @@ public class JwtAuthenticationService extends DefaultAuthenticationService {
         //on appelle la méthode d'authenfication de Spring Security
         Authentication authentication = (Authentication) super.authenticate(username, password);
         String token = jwtUtils.generateToken((AbstractUserDetails) authentication.getPrincipal());
-        return token;
+        Long connectedUserId = ((AbstractUserDetails) authentication.getPrincipal()).getId();
+        return new Pair<Long, String>(connectedUserId, token);
     }
 
 }

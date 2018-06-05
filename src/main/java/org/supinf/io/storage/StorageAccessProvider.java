@@ -22,7 +22,7 @@ public interface StorageAccessProvider {
      *
      * @param fileResource
      */
-    public void createFile(FileResource fileResource);
+    public void createFile(FileResource fileResource, Object originalFile) throws Exception;
 
     /**
      *
@@ -49,5 +49,10 @@ public interface StorageAccessProvider {
      * @param name
      */
     public void renameResource(Resource resource, String name);
+
+    /**
+     * Cette méthode permet de creer le répertoire racine
+     */
+    public void createRootFolder();
 
 }
