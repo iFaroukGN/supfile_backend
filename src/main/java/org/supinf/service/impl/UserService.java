@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.supinf.config.JwtWebSecurityConfigurerAdapter;
+import org.supinf.entities.projection.UserWithoutPassword;
 
 /**
  *
@@ -77,5 +78,5 @@ public class UserService implements IUserService {
     public User findByFacebookEmail(String facebookEmail) {
         return userRepository.findByFacebookEmail(facebookEmail);
     }
-
+    
 }

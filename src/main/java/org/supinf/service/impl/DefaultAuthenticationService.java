@@ -13,8 +13,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.supinf.config.JwtWebSecurityConfigurerAdapter;
+import org.supinf.entities.User;
+import org.supinf.security.AbstractUserDetails;
 import org.supinf.service.IAuthenticationService;
 import org.supinf.webapi.AuthenticationResponse;
+import org.supinf.entities.projection.UserWithoutPassword;
 
 /**
  * Une implémentation du service d'authentification
@@ -24,6 +27,8 @@ import org.supinf.webapi.AuthenticationResponse;
 @Component
 public class DefaultAuthenticationService implements IAuthenticationService {
 
+    @Autowired
+    private UserService userService;
     /**
      * Injection instance AuthenticationManager.
      *
@@ -47,6 +52,42 @@ public class DefaultAuthenticationService implements IAuthenticationService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return authentication;
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public UserWithoutPassword getAuthenticatedUser() {
+        Long userId = ((AbstractUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+        User authenticatedUser = userService.findOne(userId);
+        return new UserWithoutPassword() {
+            @Override
+            public Long getId() {
+                return authenticatedUser.getId();
+            }
+
+            @Override
+            public String getUsername() {
+                return authenticatedUser.getUsername();
+            }
+
+            @Override
+            public String getEmail() {
+                return authenticatedUser.getEmail();
+            }
+
+            @Override
+            public String getFacebookEmail() {
+                return authenticatedUser.getFacebookEmail();
+            }
+
+            @Override
+            public String getGoogleEmail() {
+                return authenticatedUser.getGoogleEmail();
+            }
+        };
     }
 
 }

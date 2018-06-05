@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.supinf.service.IAuthenticationService;
 import org.supinf.webapi.AuthenticationRequest;
 import org.supinf.webapi.AuthenticationResponse;
+import org.supinf.entities.projection.UserWithoutPassword;
 
 /**
  *
@@ -74,6 +75,15 @@ public class AuthenticationController {
      */
     @GetMapping("/logout")
     public void logout() {
+    }
+
+    /**
+     *
+     * Url permettant de se déconnecter
+     */
+    @GetMapping("/loggeduser")
+    public ResponseEntity<UserWithoutPassword> loggedUser() {
+        return ResponseEntity.ok(authenticationService.getAuthenticatedUser());
     }
 
 }

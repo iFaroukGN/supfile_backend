@@ -6,6 +6,8 @@
 package org.supinf.service;
 
 import org.springframework.security.core.Authentication;
+import org.supinf.entities.User;
+import org.supinf.entities.projection.UserWithoutPassword;
 
 /**
  * une interface qui permet de s'authetifier avec Spring Security
@@ -20,4 +22,9 @@ public interface IAuthenticationService {
      * @return 
      */
     public Object authenticate(Object username, Object password);
+    
+    /**
+     * renvoie l'utilisateur connecté
+     */
+    public UserWithoutPassword getAuthenticatedUser();
 }
