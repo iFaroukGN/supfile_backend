@@ -60,6 +60,12 @@ public abstract class Resource implements Serializable {
 	public void setPath(String path) {
 		this.path = path;
 	}
+	public Resource getResource() {
+		return resource;
+	}
+	public void setResource(Resource resource) {
+		this.resource = resource;
+	}
 	
 	// Constructeur sans parametre
 	public Resource() {
@@ -68,12 +74,21 @@ public abstract class Resource implements Serializable {
 	}
 	
 	//Constructeur avec parametre 
-	public Resource(String name, String path, User user) {
+	public Resource(String name, String path, User user, Resource resource) {
 		super();
 		this.name = name;
 		this.path = path;
 		this.user = user;
+		this.resource = resource;
 	}
+	
+	//Constructeur avec parametre 
+		public Resource(String name, String path, User user) {
+			super();
+			this.name = name;
+			this.path = path;
+			this.user = user;
+		}
 	
 	
 
