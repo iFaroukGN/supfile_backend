@@ -29,6 +29,10 @@ public abstract class Resource implements Serializable {
 	
 	@ManyToOne
 	@JoinColumn(name="ID")
+	protected Resource resource;
+	
+	@ManyToOne
+	@JoinColumn(name="ID")
 	protected User user;
 	
 	// Getters and setters
