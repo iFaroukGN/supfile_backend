@@ -12,7 +12,7 @@ import org.supinf.config.JwtWebSecurityConfigurerAdapter;
 
 /**
  *
- * @author Edem 
+ * @author Edem Amegbeto
  */
 @Service
 @Transactional
