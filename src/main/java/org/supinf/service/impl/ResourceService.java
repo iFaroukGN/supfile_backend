@@ -63,20 +63,4 @@ public class ResourceService implements IResourceService {
     public void delete(Resource resource) {
         resourceRepository.delete(resource);
     }
-
-	@Override
-	public Resource findByEmail(String email) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Resource findByFacebookEmail(String facebookEmail) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-    
-    
-    
-
 }

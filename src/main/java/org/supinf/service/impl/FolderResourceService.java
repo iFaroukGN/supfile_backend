@@ -64,7 +64,5 @@ public class FolderResourceService implements IFolderResourceService {
         folderResourceRepository.delete(folderResource);
     }
     
-    
-    
 
 }

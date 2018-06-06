@@ -49,13 +49,4 @@ public interface IResourceService {
      */
     public void delete(Resource resource);
 
-    /**
-     * @see ResourceRepository#findByEmail(java.lang.String)
-     */
-    public Resource findByEmail(String email);
-
-    /**
-     * @see ResourceRepository#findByFacebookEmail(java.lang.String)
-     */
-    public Resource findByFacebookEmail(String facebookEmail);
 }
