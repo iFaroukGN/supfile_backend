@@ -8,6 +8,7 @@ import org.supinf.entities.FileResource;
 import org.supinf.entities.FolderResource;
 import org.supinf.entities.Resource;
 import org.supinf.entities.User;
+import org.supinf.service.impl.FolderResourceService;
 
 /**
  * Classe pour interagir avec le système de fichiers local
@@ -32,7 +33,9 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
 
     @Override
     public void createFolder(FolderResource folderResource) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String resourceAbsolutePath = buildResourceAbsolutePath(folderResource);
+        File file = new File(resourceAbsolutePath);
+        file.mkdir();
     }
 
     @Override
@@ -60,9 +63,36 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
 
     @Override
     public void initUserStorageSpace(User user) {
-        File userStorageSpace = new File(getStorageRootPath(), String.valueOf(user.getId()));
-        if(!userStorageSpace.exists()){
+        File userStorageSpace = new File(getStorageRootPath(), userStorageSpaceResourceName(user));
+        if (!userStorageSpace.exists()) {
             userStorageSpace.mkdir();
+            persistUserStorageSpaceResource(user);
         }
+    }
+
+    private String userStorageSpaceResourceName(User user) {
+        return String.valueOf(user.getId());
+    }
+
+    private void persistUserStorageSpaceResource(User user) {
+        FolderResource userStorageResource = new FolderResource(userStorageSpaceResourceName(user), null, user);
+        folderResourceService.save(userStorageResource);
+    }
+
+    @Override
+    public String buildResourceAbsolutePath(Resource resource) {
+
+        // si la resource parent de la ressource courante est null c'est qu'on est à la racine
+        FolderResource parent = (FolderResource) resource.getResource();
+
+        //
+        String resourceName = resource.getName();
+        if (parent == null) {
+            return getStorageRootPath() + resourceName;
+        }
+        // on récupère le parent de la base de données pour avoir son ascendence
+        FolderResource persistedParent = folderResourceService.findOne(parent.getId());
+
+        return String.join("", buildResourceAbsolutePath(persistedParent), "/", resourceName);
     }
 }

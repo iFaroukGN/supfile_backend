@@ -63,6 +63,13 @@ public class FolderResourceService implements IFolderResourceService {
     public void delete(FolderResource folderResource) {
         folderResourceRepository.delete(folderResource);
     }
-    
+
+    /**
+     * @see IFolderResourceService#findUserDefaultFolder(java.lang.Long) 
+     */
+    @Override
+    public FolderResource findUserDefaultFolder(Long ownerId) {
+        return folderResourceRepository.findOneByUserIdAndResourceIsNull(ownerId);
+    }
 
 }

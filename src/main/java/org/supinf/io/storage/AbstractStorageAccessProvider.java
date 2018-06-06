@@ -2,7 +2,8 @@ package org.supinf.io.storage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
+import org.supinf.service.IFolderResourceService;
+import org.supinf.service.IResourceService;
 
 /**
  * Classe abstraite pour interagir avec le système de stockage
@@ -12,16 +13,19 @@ import org.springframework.core.env.Environment;
  */
 public abstract class AbstractStorageAccessProvider implements StorageAccessProvider {
 
-    
-//    @Autowired
-//    private Environment env;
+    @Autowired
+    protected IFolderResourceService folderResourceService;
+
+    @Autowired
+    protected IResourceService resourceService;
+
     //Le répertoire de racine du sysème de stockage
     @Value("${storage.root}")
     private String storageRootPath;
 
     // Getter 
     public String getStorageRootPath() {
-        return storageRootPath+"/";
+        return storageRootPath + "/";
     }
 
 }

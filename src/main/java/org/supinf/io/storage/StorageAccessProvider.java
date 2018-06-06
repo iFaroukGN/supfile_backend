@@ -60,5 +60,10 @@ public interface StorageAccessProvider {
      * initialiser l'espace de stockage de l'utilisateur
      */
     public void initUserStorageSpace(User user);
+    
+    /**
+     * Construire le chemin absolu d'une ressource sur le système de stockage
+     */
+    public String buildResourceAbsolutePath(Resource resource);
 
 }

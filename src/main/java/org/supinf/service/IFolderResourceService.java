@@ -48,5 +48,13 @@ public interface IFolderResourceService {
      */
     public void delete(FolderResource folderResource);
 
-    
+    /**
+     * Récupérer le dossier par défaut de l'utilisateur dont
+     * l'identifiant est passé en paramètre
+     *
+     * @param ownerId
+     * @return
+     */
+    public FolderResource findUserDefaultFolder(Long ownerId);
+
 }
