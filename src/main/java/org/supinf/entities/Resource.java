@@ -32,7 +32,7 @@ public abstract class Resource implements Serializable {
 	protected Resource resource;
 	
 	@ManyToOne
-	@JoinColumn(name="ID")
+	@JoinColumn(name="OWNER")
 	protected User user;
 	
 	// Getters and setters

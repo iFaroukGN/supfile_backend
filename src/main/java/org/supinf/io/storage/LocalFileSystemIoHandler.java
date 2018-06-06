@@ -65,5 +65,4 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
             userStorageSpace.mkdir();
         }
     }
-
 }

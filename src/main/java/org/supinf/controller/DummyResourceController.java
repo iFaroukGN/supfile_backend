@@ -1,7 +1,5 @@
 package org.supinf.controller;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.supinf.entities.FolderResource;
 import org.supinf.io.storage.AbstractStorageAccessProvider;
-import org.supinf.io.storage.StorageAccessProvider;
 
 /**
  *
