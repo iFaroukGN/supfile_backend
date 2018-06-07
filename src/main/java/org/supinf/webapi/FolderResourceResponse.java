@@ -10,6 +10,11 @@ public class FolderResourceResponse {
      * L'identifiant de l'entité
      */
     protected Long id;
+   
+    /**
+     * un message sur l'operation concernant la ressource
+     */
+    protected String message;
 
     /**
      * 
@@ -26,6 +31,19 @@ public class FolderResourceResponse {
      */
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public FolderResourceResponse( String message, Long id) {
+        this.id = id;
+        this.message = message;
     }
     
     

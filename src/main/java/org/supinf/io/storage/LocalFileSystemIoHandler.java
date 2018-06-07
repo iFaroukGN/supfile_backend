@@ -27,6 +27,12 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
     @Override
     public void createFile(FileResource fileResource, Object originalFile) throws IOException {
         MultipartFile file = (MultipartFile) originalFile;
+        String absoluteFilePath = buildResourceAbsolutePath(fileResource);
+        File destination = new File(absoluteFilePath);
+        file.transferTo(destination);
+    }
+    public void createFileSave(FileResource fileResource, Object originalFile) throws IOException {
+        MultipartFile file = (MultipartFile) originalFile;
         File destination = new File(getStorageRootPath(), file.getOriginalFilename());
         file.transferTo(destination);
     }

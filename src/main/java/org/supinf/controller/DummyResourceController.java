@@ -12,13 +12,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.supinf.entities.FileResource;
 import org.supinf.entities.FolderResource;
 import org.supinf.entities.User;
 import org.supinf.entities.projection.UserWithoutPassword;
 import org.supinf.io.storage.AbstractStorageAccessProvider;
 import org.supinf.service.IAuthenticationService;
+import org.supinf.service.IFileResourceService;
 import org.supinf.service.IFolderResourceService;
 import org.supinf.service.IUserService;
+import org.supinf.webapi.FileResourceResponse;
 import org.supinf.webapi.FolderResourceRequest;
 import org.supinf.webapi.FolderResourceResponse;
 
@@ -44,6 +47,12 @@ public class DummyResourceController {
     private IFolderResourceService folderResourceService;
 
     /**
+     * injection instance IFileResourceService
+     */
+    @Autowired
+    private IFileResourceService fileResourceService;
+    
+    /**
      * injection instance IAuthenticationService
      */
     @Autowired
@@ -60,7 +69,7 @@ public class DummyResourceController {
      *
      * @param file
      * @return
-     */
+     *
     @PostMapping(value = "/upload", consumes = "multipart/form-data")
     public ResponseEntity<Object> upload(@RequestParam MultipartFile file) {
 
@@ -74,6 +83,45 @@ public class DummyResourceController {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
         return new ResponseEntity<>(message, status);
+    }*/
+    /**
+     *
+     * @param file
+     * @return
+     */
+    @PostMapping(value = "/upload", consumes = "multipart/form-data")
+    public ResponseEntity<Object> upload(@RequestParam MultipartFile file, @RequestParam(required=false) Long parentFolderId) {
+        // id de l'utilisateur connecté
+        Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
+        
+        // On récupère l'utilisateur connecté
+        User connectedUser = userService.findOne(connectedUserId);
+        
+        // On récupère le répertoire par défaut de l'utilisateur
+        FolderResource userRootFolder = folderResourceService.findUserDefaultFolder(connectedUserId);
+        
+        FileResource fileResource = new FileResource(file.getOriginalFilename(), null, connectedUser, file.getSize());
+        
+        // si le dossier est créé directement dans l'espace de stockage de l'utilisateur
+        if (parentFolderId == null || parentFolderId <= 0) {
+            fileResource.setResource(userRootFolder);
+        } else {
+            fileResource.setResource(folderResourceService.findOne(parentFolderId));
+        }
+        // on sauvegarde le fichier dns la base de données
+        FileResource persistedFileResource = fileResourceService.save(fileResource);
+        
+        String message = "File successfully uploaded ...";
+        HttpStatus status = HttpStatus.OK;
+        try {
+            storageAccess.createFile(persistedFileResource, file);
+        } catch (Exception ex) {
+            Logger.getLogger(DummyResourceController.class.getName()).log(Level.SEVERE, null, ex);
+            message = " error while uploading file ...";
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        FileResourceResponse response = new FileResourceResponse(message,persistedFileResource.getId());
+        return new ResponseEntity<>(response, status);
     }
 
     /**
@@ -87,12 +135,12 @@ public class DummyResourceController {
 
         // id de l'utilisateur connecté
         Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
-
-        // l'id de la ressource parent du dossier à créer
-        Long parentFolderId = folderResourceRequest.getParentId();
-
+        
         // On récupère l'utilisateur connecté
         User connectedUser = userService.findOne(connectedUserId);
+        
+        // l'id de la ressource parent du dossier à créer
+        Long parentFolderId = folderResourceRequest.getParentId();
 
         // on crée un dossier depuis les informations envoyées
         FolderResource folder = new FolderResource(folderResourceRequest.getName(), null, connectedUser);
