@@ -1,5 +1,6 @@
 package org.supinf.controller;
 
+import io.swagger.annotations.ApiOperation;
 import org.supinf.entities.User;
 import org.supinf.service.IUserService;
 import java.util.List;
@@ -55,6 +56,7 @@ public class UserController {
      * @param user
      * @return l'identifiant de l'utilisateur créé
      */
+    @ApiOperation(value = "Créer un profil utilisateur")
     @PostMapping
     public ResponseEntity<UserResponse> save(@RequestBody User user) {
         //On chiffre le mot de passe avant de l'enregistrer
@@ -89,6 +91,7 @@ public class UserController {
      * @param user
      * @return
      */
+    @ApiOperation(value = "Modifier un profil utilisateur")
     @PutMapping
     public ResponseEntity<User> update(@RequestBody User user) {
         //On chiffre le mot de passe avant de l'enregistrer
@@ -103,6 +106,7 @@ public class UserController {
      *
      * @return La liste des utilisateurs
      */
+    @ApiOperation(value = "Lister tous les profils utilisateur")
     @GetMapping
     public ResponseEntity<List<User>> findAll() {
         return ResponseEntity.ok(userService.findAll());
@@ -115,6 +119,7 @@ public class UserController {
      * @param id
      * @return
      */
+    @ApiOperation(value = "Supprimer un profil utilisateur")
     @DeleteMapping("/{id}")
     public ResponseEntity<User> delete(@PathVariable Long id) {
         //On retrouve l'entité à partir de son identifiant

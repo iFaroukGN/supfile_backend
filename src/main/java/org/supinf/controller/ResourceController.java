@@ -1,5 +1,6 @@
 package org.supinf.controller;
 
+import io.swagger.annotations.ApiOperation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.supinf.service.IUserService;
 import org.supinf.webapi.FileResourceResponse;
 import org.supinf.webapi.FolderResourceRequest;
 import org.supinf.webapi.FolderResourceResponse;
+import org.supinf.webapi.RenameResourceRequest;
 
 /**
  *
@@ -31,7 +33,7 @@ import org.supinf.webapi.FolderResourceResponse;
  */
 @RestController
 @RequestMapping("/resource")
-public class DummyResourceController {
+public class ResourceController {
 
     /**
      * injection instance StorageAccessProvider
@@ -51,7 +53,7 @@ public class DummyResourceController {
      */
     @Autowired
     private IFileResourceService fileResourceService;
-    
+
     /**
      * injection instance IAuthenticationService
      */
@@ -69,39 +71,21 @@ public class DummyResourceController {
      *
      * @param file
      * @return
-     *
-    @PostMapping(value = "/upload", consumes = "multipart/form-data")
-    public ResponseEntity<Object> upload(@RequestParam MultipartFile file) {
-
-        String message = "File successfully uploaded ...";
-        HttpStatus status = HttpStatus.OK;
-        try {
-            storageAccess.createFile(null, file);
-        } catch (Exception ex) {
-            Logger.getLogger(DummyResourceController.class.getName()).log(Level.SEVERE, null, ex);
-            message = " error while uploading file ...";
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
-        }
-        return new ResponseEntity<>(message, status);
-    }*/
-    /**
-     *
-     * @param file
-     * @return
      */
+    @ApiOperation(value = "Télécharger un fichier dans un dossier")
     @PostMapping(value = "/upload", consumes = "multipart/form-data")
-    public ResponseEntity<Object> upload(@RequestParam MultipartFile file, @RequestParam(required=false) Long parentFolderId) {
+    public ResponseEntity<Object> upload(@RequestParam MultipartFile file, @RequestParam(required = false) Long parentFolderId) {
         // id de l'utilisateur connecté
         Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
-        
+
         // On récupère l'utilisateur connecté
         User connectedUser = userService.findOne(connectedUserId);
-        
+
         // On récupère le répertoire par défaut de l'utilisateur
         FolderResource userRootFolder = folderResourceService.findUserDefaultFolder(connectedUserId);
-        
+
         FileResource fileResource = new FileResource(file.getOriginalFilename(), null, connectedUser, file.getSize());
-        
+
         // si le dossier est créé directement dans l'espace de stockage de l'utilisateur
         if (parentFolderId == null || parentFolderId <= 0) {
             fileResource.setResource(userRootFolder);
@@ -110,17 +94,17 @@ public class DummyResourceController {
         }
         // on sauvegarde le fichier dns la base de données
         FileResource persistedFileResource = fileResourceService.save(fileResource);
-        
-        String message = "File successfully uploaded ...";
+
+        String message = "Fichier téléchargé avec succès ...";
         HttpStatus status = HttpStatus.OK;
         try {
             storageAccess.createFile(persistedFileResource, file);
         } catch (Exception ex) {
-            Logger.getLogger(DummyResourceController.class.getName()).log(Level.SEVERE, null, ex);
-            message = " error while uploading file ...";
+            Logger.getLogger(ResourceController.class.getName()).log(Level.SEVERE, null, ex);
+            message = "Erreur lors du téléchargement  ...";
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
-        FileResourceResponse response = new FileResourceResponse(message,persistedFileResource.getId());
+        FileResourceResponse response = new FileResourceResponse(message, persistedFileResource.getId());
         return new ResponseEntity<>(response, status);
     }
 
@@ -130,15 +114,16 @@ public class DummyResourceController {
      * @param file
      * @return
      */
+    @ApiOperation(value = "Créer un dossier")
     @PostMapping(value = "/folders", consumes = "application/json")
     public ResponseEntity<FolderResourceResponse> createFolder(@RequestBody FolderResourceRequest folderResourceRequest) {
 
         // id de l'utilisateur connecté
         Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
-        
+
         // On récupère l'utilisateur connecté
         User connectedUser = userService.findOne(connectedUserId);
-        
+
         // l'id de la ressource parent du dossier à créer
         Long parentFolderId = folderResourceRequest.getParentId();
 
@@ -163,7 +148,66 @@ public class DummyResourceController {
         //on crée le dossier sur le système de fichier
         storageAccess.createFolder(persistedFolder);
         // Création 
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok(new FolderResourceResponse("Dossier créé avec succès", persistedFolder.getId()));
     }
 
+    /**
+     * Créer un dossier
+     *
+     * @param file
+     * @return
+     */
+    @ApiOperation(value = "Renommer un dossier")
+    @PostMapping(value = "/folders/rename", consumes = "application/json")
+    public ResponseEntity<FolderResourceResponse> renameFolder(@RequestBody RenameResourceRequest renameResourceRequest) {
+
+        // id de l'utilisateur connecté
+        Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
+
+        // On récupère l'utilisateur connecté
+        User connectedUser = userService.findOne(connectedUserId);
+
+        // on crée un dossier depuis les informations envoyées
+        FolderResource folder = folderResourceService.findOne(renameResourceRequest.getId());
+
+        folder.setName(renameResourceRequest.getName());
+
+        //créer le dossier dans la base de données
+        FolderResource persistedFolder = folderResourceService.update(folder);
+
+        //on crée le dossier sur le système de fichier
+        storageAccess.renameResource(folder, renameResourceRequest.getName());
+        // Création 
+        return ResponseEntity.ok(new FolderResourceResponse("Dossier renommé avec succès", persistedFolder.getId()));
+    }
+
+    /**
+     * Créer un dossier
+     *
+     * @param file
+     * @return
+     */
+    @ApiOperation(value = "Renommer un fichier")
+    @PostMapping(value = "/files/rename", consumes = "application/json")
+    public ResponseEntity<FolderResourceResponse> renameFile(@RequestBody RenameResourceRequest renameResourceRequest) {
+
+        // id de l'utilisateur connecté
+        Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
+
+        // On récupère l'utilisateur connecté
+        User connectedUser = userService.findOne(connectedUserId);
+
+        // on crée un dossier depuis les informations envoyées
+        FileResource file = fileResourceService.findOne(renameResourceRequest.getId());
+
+        file.setName(renameResourceRequest.getName());
+
+        //créer le dossier dans la base de données
+        FileResource persistedFolder = fileResourceService.update(file);
+
+        //on crée le dossier sur le système de fichier
+        storageAccess.renameResource(file, renameResourceRequest.getName());
+        // Création 
+        return ResponseEntity.ok(new FolderResourceResponse("Fichier renommé avec succès", persistedFolder.getId()));
+    }
 }
