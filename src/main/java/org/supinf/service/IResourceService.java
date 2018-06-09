@@ -48,5 +48,11 @@ public interface IResourceService {
      * @param resource
      */
     public void delete(Resource resource);
-
+    
+    /**
+     * Vérifier si la resource existe déjà
+     *
+     * @param resource
+     */
+    public Boolean exists(Long ownerId, Long parentFolderId, String name);
 }

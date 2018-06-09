@@ -67,8 +67,8 @@ public class FolderResourceRequest {
     }
 
     /**
-     *
-     * @param parentId
+     * 
+     * @param parentId si null, le répertoire parent sera l'espace par défaut de l'utilisateur
      */
     public void setParentId(Long parentId) {
         this.parentId = parentId;

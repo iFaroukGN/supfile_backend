@@ -21,6 +21,7 @@ import org.supinf.io.storage.AbstractStorageAccessProvider;
 import org.supinf.service.IAuthenticationService;
 import org.supinf.service.IFileResourceService;
 import org.supinf.service.IFolderResourceService;
+import org.supinf.service.IResourceService;
 import org.supinf.service.IUserService;
 import org.supinf.webapi.FileResourceResponse;
 import org.supinf.webapi.FolderResourceRequest;
@@ -41,6 +42,12 @@ public class ResourceController {
     @Autowired
     @Qualifier("localFileSystemIoHandler")
     AbstractStorageAccessProvider storageAccess;
+
+    /**
+     * injection instance IResourceService
+     */
+    @Autowired
+    private IResourceService resourceService;
 
     /**
      * injection instance IFolderResourceService
@@ -77,6 +84,11 @@ public class ResourceController {
     public ResponseEntity<Object> upload(@RequestParam MultipartFile file, @RequestParam(required = false) Long parentFolderId) {
         // id de l'utilisateur connecté
         Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
+
+        // si la ressource existe déjà
+        if (resourceService.exists(connectedUserId, parentFolderId, file.getOriginalFilename())) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new FileResourceResponse("Le fichier existe déjà", null));
+        }
 
         // On récupère l'utilisateur connecté
         User connectedUser = userService.findOne(connectedUserId);
@@ -116,19 +128,27 @@ public class ResourceController {
      */
     @ApiOperation(value = "Créer un dossier")
     @PostMapping(value = "/folders", consumes = "application/json")
-    public ResponseEntity<FolderResourceResponse> createFolder(@RequestBody FolderResourceRequest folderResourceRequest) {
+    public ResponseEntity<Object> createFolder(@RequestBody FolderResourceRequest folderResourceRequest) {
 
-        // id de l'utilisateur connecté
-        Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
-
-        // On récupère l'utilisateur connecté
-        User connectedUser = userService.findOne(connectedUserId);
+        //le nom du dossier
+        String resourceName = folderResourceRequest.getName();
 
         // l'id de la ressource parent du dossier à créer
         Long parentFolderId = folderResourceRequest.getParentId();
 
+        // id de l'utilisateur connecté
+        Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
+
+        // si la ressource existe déjà
+        if (resourceService.exists(connectedUserId, parentFolderId, resourceName)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new FolderResourceResponse("Le dossier existe déjà", null));
+        }
+
+        // On récupère l'utilisateur connecté
+        User connectedUser = userService.findOne(connectedUserId);
+
         // on crée un dossier depuis les informations envoyées
-        FolderResource folder = new FolderResource(folderResourceRequest.getName(), null, connectedUser);
+        FolderResource folder = new FolderResource(resourceName, null, connectedUser);
 
         // On récupère le répertoire par défaut de l'utilisateur
         FolderResource userRootFolder = folderResourceService.findUserDefaultFolder(connectedUserId);

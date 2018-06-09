@@ -2,6 +2,7 @@ package org.supinf.entities;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
+import javax.persistence.Column;
 
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
@@ -13,6 +14,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.supinf.entities.User;
 
@@ -20,13 +23,15 @@ import org.supinf.entities.User;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "Type_Resource",
         discriminatorType = DiscriminatorType.STRING, length = 5)
-
+//il ne peut pas y avoir deux fichiers ou dossiers de même nom dans le même dossier pour le même utilisateur
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"NAME","PARENT","OWNER"}))
 public abstract class Resource implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @ApiModelProperty(value = "null", dataType = "java.lang.Integer", required = false)
     protected Long id;
+    @Column(name = "NAME")
     protected String name;
 
     @ApiModelProperty(hidden = true, value = "variable0", dataType = "java.lang.String", required = false)
