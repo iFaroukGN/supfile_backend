@@ -23,10 +23,9 @@ import org.supinf.service.IFileResourceService;
 import org.supinf.service.IFolderResourceService;
 import org.supinf.service.IResourceService;
 import org.supinf.service.IUserService;
-import org.supinf.webapi.FileResourceResponse;
 import org.supinf.webapi.FolderResourceRequest;
-import org.supinf.webapi.FolderResourceResponse;
 import org.supinf.webapi.RenameResourceRequest;
+import org.supinf.webapi.ResourceResponse;
 
 /**
  *
@@ -87,7 +86,7 @@ public class ResourceController {
 
         // si la ressource existe déjà
         if (resourceService.exists(connectedUserId, parentFolderId, file.getOriginalFilename())) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new FileResourceResponse("Le fichier existe déjà", null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResourceResponse("Le fichier existe déjà", null));
         }
 
         // On récupère l'utilisateur connecté
@@ -116,7 +115,7 @@ public class ResourceController {
             message = "Erreur lors du téléchargement  ...";
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
-        FileResourceResponse response = new FileResourceResponse(message, persistedFileResource.getId());
+        ResourceResponse response = new ResourceResponse(message, persistedFileResource.getId());
         return new ResponseEntity<>(response, status);
     }
 
@@ -141,7 +140,7 @@ public class ResourceController {
 
         // si la ressource existe déjà
         if (resourceService.exists(connectedUserId, parentFolderId, resourceName)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new FolderResourceResponse("Le dossier existe déjà", null));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResourceResponse("Le dossier existe déjà", null));
         }
 
         // On récupère l'utilisateur connecté
@@ -168,7 +167,7 @@ public class ResourceController {
         //on crée le dossier sur le système de fichier
         storageAccess.createFolder(persistedFolder);
         // Création 
-        return ResponseEntity.ok(new FolderResourceResponse("Dossier créé avec succès", persistedFolder.getId()));
+        return ResponseEntity.ok(new ResourceResponse("Dossier créé avec succès", persistedFolder.getId()));
     }
 
     /**
@@ -179,7 +178,7 @@ public class ResourceController {
      */
     @ApiOperation(value = "Renommer un dossier")
     @PostMapping(value = "/folders/rename", consumes = "application/json")
-    public ResponseEntity<FolderResourceResponse> renameFolder(@RequestBody RenameResourceRequest renameResourceRequest) {
+    public ResponseEntity<ResourceResponse> renameFolder(@RequestBody RenameResourceRequest renameResourceRequest) {
 
         // id de l'utilisateur connecté
         Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
@@ -198,7 +197,7 @@ public class ResourceController {
         //on crée le dossier sur le système de fichier
         storageAccess.renameResource(folder, renameResourceRequest.getName());
         // Création 
-        return ResponseEntity.ok(new FolderResourceResponse("Dossier renommé avec succès", persistedFolder.getId()));
+        return ResponseEntity.ok(new ResourceResponse("Dossier renommé avec succès", persistedFolder.getId()));
     }
 
     /**
@@ -209,7 +208,7 @@ public class ResourceController {
      */
     @ApiOperation(value = "Renommer un fichier")
     @PostMapping(value = "/files/rename", consumes = "application/json")
-    public ResponseEntity<FolderResourceResponse> renameFile(@RequestBody RenameResourceRequest renameResourceRequest) {
+    public ResponseEntity<ResourceResponse> renameFile(@RequestBody RenameResourceRequest renameResourceRequest) {
 
         // id de l'utilisateur connecté
         Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
@@ -228,6 +227,6 @@ public class ResourceController {
         //on crée le dossier sur le système de fichier
         storageAccess.renameResource(file, renameResourceRequest.getName());
         // Création 
-        return ResponseEntity.ok(new FolderResourceResponse("Fichier renommé avec succès", persistedFolder.getId()));
+        return ResponseEntity.ok(new ResourceResponse("Fichier renommé avec succès", persistedFolder.getId()));
     }
 }
