@@ -2,6 +2,7 @@ package org.supinf.io.storage;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.supinf.entities.FileResource;
@@ -19,6 +20,14 @@ import org.supinf.service.impl.FolderResourceService;
 @Component
 public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
 
+    /**
+     * Constante
+     */
+    public static final String PATH_SEPARATOR = "/";
+
+    /**
+     * @see StorageAccessProvider#createResource(org.supinf.entities.Resource)
+     */
     @Override
     public void createResource(Resource resource) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -31,6 +40,7 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
         File destination = new File(absoluteFilePath);
         file.transferTo(destination);
     }
+
     public void createFileSave(FileResource fileResource, Object originalFile) throws IOException {
         MultipartFile file = (MultipartFile) originalFile;
         File destination = new File(getStorageRootPath(), file.getOriginalFilename());
@@ -55,8 +65,23 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
     }
 
     @Override
-    public void renameResource(Resource resource, String name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void renameResource(Resource oldResource, String name) {
+        if (oldResource instanceof FileResource) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+        // construction du chemin absolu vers la ressource
+        String absoluteResourcePath = buildResourceAbsolutePath(oldResource);
+        // instance File représentant la ressource
+        File oldFile = new File(absoluteResourcePath);
+
+        // chemin vers le répertoire parent   |  C:/path/to/resource   ==>    C:/path/to/
+        int pathSeparatorLastIndex = absoluteResourcePath.lastIndexOf(PATH_SEPARATOR);
+        String absoluteResourcePathParent = absoluteResourcePath.substring(0, pathSeparatorLastIndex + 1);
+
+        // instance File représentant la ressource avec le nouveu nom
+        File newFile = new File(absoluteResourcePathParent, name);
+        oldFile.renameTo(newFile);
+
     }
 
     @Override
@@ -99,6 +124,6 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
         // on récupère le parent de la base de données pour avoir son ascendence
         FolderResource persistedParent = folderResourceService.findOne(parent.getId());
 
-        return String.join("", buildResourceAbsolutePath(persistedParent), "/", resourceName);
+        return String.join("", buildResourceAbsolutePath(persistedParent), PATH_SEPARATOR, resourceName);
     }
 }

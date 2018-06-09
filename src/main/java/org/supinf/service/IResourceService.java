@@ -50,9 +50,19 @@ public interface IResourceService {
     public void delete(Resource resource);
     
     /**
-     * Vérifier si la resource existe déjà
+     * Vérifier si une resource existe déjà
      *
      * @param resource
      */
-    public Boolean exists(Long ownerId, Long parentFolderId, String name);
+    public Boolean isDuplicated(Resource resource);
+    
+    /**
+     * Vérifie si une ressource existe en prenant en compte les critères en paramètre
+     * 
+     * @param ownerId
+     * @param parentFolderId
+     * @param name
+     * @return 
+     */
+    public Boolean isDuplicated(Long ownerId, Long parentFolderId, String name);
 }

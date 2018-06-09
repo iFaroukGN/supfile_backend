@@ -85,8 +85,8 @@ public class ResourceController {
         Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
 
         // si la ressource existe déjà
-        if (resourceService.exists(connectedUserId, parentFolderId, file.getOriginalFilename())) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResourceResponse("Le fichier existe déjà", null));
+        if (resourceService.isDuplicated(connectedUserId, parentFolderId, file.getOriginalFilename())) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResourceResponse("Un fichier de même nom existe déjà", null));
         }
 
         // On récupère l'utilisateur connecté
@@ -139,8 +139,8 @@ public class ResourceController {
         Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
 
         // si la ressource existe déjà
-        if (resourceService.exists(connectedUserId, parentFolderId, resourceName)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResourceResponse("Le dossier existe déjà", null));
+        if (resourceService.isDuplicated(connectedUserId, parentFolderId, resourceName)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResourceResponse("Un dossier de même nom existe déjà", null));
         }
 
         // On récupère l'utilisateur connecté
@@ -180,22 +180,29 @@ public class ResourceController {
     @PostMapping(value = "/folders/rename", consumes = "application/json")
     public ResponseEntity<ResourceResponse> renameFolder(@RequestBody RenameResourceRequest renameResourceRequest) {
 
-        // id de l'utilisateur connecté
-        Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
-
-        // On récupère l'utilisateur connecté
-        User connectedUser = userService.findOne(connectedUserId);
-
-        // on crée un dossier depuis les informations envoyées
+        // TODO contrôler  que le dossier qui est en train d'être renommé n'est pas celui par défaut de l'utilisateur
+        // on récupère un dossier depuis les informations envoyées
         FolderResource folder = folderResourceService.findOne(renameResourceRequest.getId());
+        
+        String newName = renameResourceRequest.getName();
+         // si la ressource existe déjà
+        if (resourceService.isDuplicated(folder.getUser().getId(), folder.getResource().getId(), newName)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResourceResponse("Un dossier de même nom existe déjà", null));
+        }
 
+        // clone
+        FolderResource oldFolder = new FolderResource(folder.getName(), null, folder.getUser());
+        oldFolder.setId(folder.getId());
+        oldFolder.setResource(folder.getResource());
+
+        // modèle màj
         folder.setName(renameResourceRequest.getName());
 
         //créer le dossier dans la base de données
         FolderResource persistedFolder = folderResourceService.update(folder);
 
         //on crée le dossier sur le système de fichier
-        storageAccess.renameResource(folder, renameResourceRequest.getName());
+        storageAccess.renameResource(oldFolder, renameResourceRequest.getName());
         // Création 
         return ResponseEntity.ok(new ResourceResponse("Dossier renommé avec succès", persistedFolder.getId()));
     }

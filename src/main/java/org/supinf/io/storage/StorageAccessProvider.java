@@ -46,10 +46,10 @@ public interface StorageAccessProvider {
 
     /**
      *
-     * @param resource
+     * @param oldResource
      * @param name
      */
-    public void renameResource(Resource resource, String name);
+    public void renameResource(Resource oldResource, String name);
 
     /**
      * Cette méthode permet de creer le répertoire racine
