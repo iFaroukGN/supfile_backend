@@ -28,11 +28,9 @@ public class FileResource extends Resource {
 		this.size = size;
 	}
 	
-	
-	
-	
-	
-	
-	
-
+	 @Override
+    public String toString() {
+        return "Resource{" + "id=" + id + ", name=" + name + ", path=" + path + ", size=" + size  + "}";
+    }
+    
 }

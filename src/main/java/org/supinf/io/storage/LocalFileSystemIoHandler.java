@@ -3,8 +3,11 @@ package org.supinf.io.storage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import org.supinf.controller.ResourceController;
 import org.supinf.entities.FileResource;
 import org.supinf.entities.FolderResource;
 import org.supinf.entities.Resource;
@@ -20,6 +23,7 @@ import org.supinf.service.impl.FolderResourceService;
 @Component
 public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
 
+    public static final Logger LOGGER = LoggerFactory.getLogger(LocalFileSystemIoHandler.class);
     /**
      * Constante
      */
@@ -37,6 +41,7 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
     public void createFile(FileResource fileResource, Object originalFile) throws IOException {
         MultipartFile file = (MultipartFile) originalFile;
         String absoluteFilePath = buildResourceAbsolutePath(fileResource);
+        LOGGER.info("Destination path ***************************************** " + absoluteFilePath   );
         File destination = new File(absoluteFilePath);
         file.transferTo(destination);
     }

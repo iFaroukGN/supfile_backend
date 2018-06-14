@@ -2,7 +2,8 @@ package org.supinf.controller;
 
 import io.swagger.annotations.ApiOperation;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,8 @@ import org.supinf.webapi.ResourceResponse;
 @RestController
 @RequestMapping("/resource")
 public class ResourceController {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(ResourceController.class);
 
     /**
      * injection instance StorageAccessProvider
@@ -91,6 +94,7 @@ public class ResourceController {
 
         // On récupère l'utilisateur connecté
         User connectedUser = userService.findOne(connectedUserId);
+        LOGGER.info("Connected user ***************************************** " + connectedUser);
 
         // On récupère le répertoire par défaut de l'utilisateur
         FolderResource userRootFolder = folderResourceService.findUserDefaultFolder(connectedUserId);
@@ -105,13 +109,14 @@ public class ResourceController {
         }
         // on sauvegarde le fichier dns la base de données
         FileResource persistedFileResource = fileResourceService.save(fileResource);
+        LOGGER.info("Destination file ***************************************** " + persistedFileResource   );
 
         String message = "Fichier téléchargé avec succès ...";
         HttpStatus status = HttpStatus.OK;
         try {
             storageAccess.createFile(persistedFileResource, file);
         } catch (Exception ex) {
-            Logger.getLogger(ResourceController.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.error(ex.getMessage(), ex);
             message = "Erreur lors du téléchargement  ...";
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
@@ -183,9 +188,9 @@ public class ResourceController {
         // TODO contrôler  que le dossier qui est en train d'être renommé n'est pas celui par défaut de l'utilisateur
         // on récupère un dossier depuis les informations envoyées
         FolderResource folder = folderResourceService.findOne(renameResourceRequest.getId());
-        
+
         String newName = renameResourceRequest.getName();
-         // si la ressource existe déjà
+        // si la ressource existe déjà
         if (resourceService.isDuplicated(folder.getUser().getId(), folder.getResource().getId(), newName)) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResourceResponse("Un dossier de même nom existe déjà", null));
         }
