@@ -41,14 +41,8 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
     public void createFile(FileResource fileResource, Object originalFile) throws IOException {
         MultipartFile file = (MultipartFile) originalFile;
         String absoluteFilePath = buildResourceAbsolutePath(fileResource);
-        LOGGER.info("Destination path ***************************************** " + absoluteFilePath   );
+        LOGGER.info("Destination path ***************************************** " + absoluteFilePath);
         File destination = new File(absoluteFilePath);
-        file.transferTo(destination);
-    }
-
-    public void createFileSave(FileResource fileResource, Object originalFile) throws IOException {
-        MultipartFile file = (MultipartFile) originalFile;
-        File destination = new File(getStorageRootPath(), file.getOriginalFilename());
         file.transferTo(destination);
     }
 
@@ -71,9 +65,7 @@ public class LocalFileSystemIoHandler extends AbstractStorageAccessProvider {
 
     @Override
     public void renameResource(Resource oldResource, String name) {
-        if (oldResource instanceof FileResource) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
+
         // construction du chemin absolu vers la ressource
         String absoluteResourcePath = buildResourceAbsolutePath(oldResource);
         // instance File représentant la ressource

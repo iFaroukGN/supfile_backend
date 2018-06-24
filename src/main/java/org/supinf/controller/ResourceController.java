@@ -109,7 +109,7 @@ public class ResourceController {
         }
         // on sauvegarde le fichier dns la base de données
         FileResource persistedFileResource = fileResourceService.save(fileResource);
-        LOGGER.info("Destination file ***************************************** " + persistedFileResource   );
+        LOGGER.info("Destination file ***************************************** " + persistedFileResource);
 
         String message = "Fichier téléchargé avec succès ...";
         HttpStatus status = HttpStatus.OK;
@@ -213,32 +213,36 @@ public class ResourceController {
     }
 
     /**
-     * Créer un dossier
+     * Renommer un fichier
      *
      * @param file
      * @return
      */
-    @ApiOperation(value = "Renommer un fichier")
+    @ApiOperation(value = "Renommer un fichier en conservant son extension")
     @PostMapping(value = "/files/rename", consumes = "application/json")
     public ResponseEntity<ResourceResponse> renameFile(@RequestBody RenameResourceRequest renameResourceRequest) {
 
-        // id de l'utilisateur connecté
-        Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
-
-        // On récupère l'utilisateur connecté
-        User connectedUser = userService.findOne(connectedUserId);
-
-        // on crée un dossier depuis les informations envoyées
+        // on récupère un dossier depuis les informations envoyées
         FileResource file = fileResourceService.findOne(renameResourceRequest.getId());
-
-        file.setName(renameResourceRequest.getName());
-
+        String fileName = file.getName();
+        String extension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf(".")) : "";
+        System.out.println("extension = " + extension);
+        String newName = renameResourceRequest.getName().concat(extension);
+        // si la ressource existe déjà
+        if (resourceService.isDuplicated(file.getUser().getId(), file.getResource().getId(), newName)) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResourceResponse("Un fichier de même nom existe déjà", null));
+        }
+        // clone
+        FileResource oldFile = new FileResource(file.getName(), null, file.getUser(), file.getSize());
+        oldFile.setId(file.getId());
+        oldFile.setResource(file.getResource());
+        // modèle màj
+        file.setName(newName);
         //créer le dossier dans la base de données
-        FileResource persistedFolder = fileResourceService.update(file);
-
+        FileResource persistedFile = fileResourceService.update(file);
         //on crée le dossier sur le système de fichier
-        storageAccess.renameResource(file, renameResourceRequest.getName());
+        storageAccess.renameResource(oldFile, newName);
         // Création 
-        return ResponseEntity.ok(new ResourceResponse("Fichier renommé avec succès", persistedFolder.getId()));
+        return ResponseEntity.ok(new ResourceResponse("Fichier renommé avec succès", persistedFile.getId()));
     }
 }
