@@ -257,25 +257,23 @@ public class ResourceController {
     /**
      * Renommer un fichier
      *
-     * @param resourceId
+     * @param id
      * @return
      */
     @ApiOperation(value = "Recupérer les informations concernant une ressource")
     @GetMapping
-    public ResponseEntity<GetResourceResponse> getResource(@RequestParam(required = false) Long resourceId) {
+    public ResponseEntity<GetResourceResponse> getResource(@RequestParam(required = false) Long id) {
 
         // id de l'utilisateur connecté
         Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
 
         Resource resource;
         //identifiant de la ressource null
-        if (resourceId == null) {
+        if (id == null) {
             resource = folderResourceService.findUserDefaultFolder(connectedUserId);
         } else {
-            resource = resourceService.findOne(resourceId);
+            resource = resourceService.findOne(id);
         }
-        resource.setId(0);
-        resource.setName("USER_ROOT");
         GetResourceResponseExtended getResourceResponse = GetResourceResponseExtended.clone( fromResource(resource));
 
         // dossier parent
@@ -287,7 +285,7 @@ public class ResourceController {
             getResourceResponse.setResources(null);
         } else {
             // Dossier 
-            List<Resource> childResources = (resourceId == null) ? resourceService.findByUserIdAndResourceIsNotNull(connectedUserId) : resourceService.findByUserIdAndResourceId(connectedUserId, resourceId);
+            List<Resource> childResources = (id == null) ? resourceService.findByUserIdAndResourceIsNotNull(connectedUserId) : resourceService.findByUserIdAndResourceId(connectedUserId, id);
             getResourceResponse.setResources(childResources.parallelStream().map(res -> {
                 return fromResource(res);
             }).collect(Collectors.toList()));
