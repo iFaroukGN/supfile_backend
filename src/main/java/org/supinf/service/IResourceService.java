@@ -65,4 +65,18 @@ public interface IResourceService {
      * @return 
      */
     public Boolean isDuplicated(Long ownerId, Long parentFolderId, String name);
+    
+    /**
+     * Recuperer les ressources qui ont un meme parent et créées par le meme utilisateur
+     *
+     * @param resource
+     */
+    public List<Resource> findByUserIdAndResourceId(Long ownerId, Long ParentFolderId);
+    
+    /**
+     * Recuperer les ressources qui ont été créées par le même utilisateur
+     *
+     * @param resource
+     */
+    public List<Resource> findByUserIdAndResourceIsNotNull(Long ownerId);
 }

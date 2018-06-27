@@ -91,4 +91,22 @@ public class ResourceService implements IResourceService {
         
         return isDuplicated(resource.getUser().getId(), resource.getResource().getId(), resource.getName());
     }
+    
+    /**
+     * Recuperer les ressources qui ont un meme parent et créées par le meme utilisateur
+     *
+     * @param resource
+     */
+    public List<Resource> findByUserIdAndResourceId(Long ownerId, Long ParentFolderId){
+        return resourceRepository.findByUserIdAndResourceId(ownerId, ParentFolderId);
+    }
+    
+    /**
+     * Recuperer les ressources qui ont été créées par le même utilisateur
+     *
+     * @param resource
+     */
+    public List<Resource> findByUserIdAndResourceIsNotNull(Long ownerId){
+        return resourceRepository.findByUserIdAndResourceIsNotNull(ownerId);
+    }
 }

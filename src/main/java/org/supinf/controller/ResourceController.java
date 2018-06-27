@@ -1,13 +1,18 @@
 package org.supinf.controller;
 
 import io.swagger.annotations.ApiOperation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import javax.websocket.server.PathParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.supinf.entities.FileResource;
 import org.supinf.entities.FolderResource;
+import org.supinf.entities.Resource;
 import org.supinf.entities.User;
 import org.supinf.entities.projection.UserWithoutPassword;
 import org.supinf.io.storage.AbstractStorageAccessProvider;
@@ -25,6 +31,8 @@ import org.supinf.service.IFolderResourceService;
 import org.supinf.service.IResourceService;
 import org.supinf.service.IUserService;
 import org.supinf.webapi.FolderResourceRequest;
+import org.supinf.webapi.GetResourceResponse;
+import org.supinf.webapi.GetResourceResponseExtended;
 import org.supinf.webapi.RenameResourceRequest;
 import org.supinf.webapi.ResourceResponse;
 
@@ -244,5 +252,68 @@ public class ResourceController {
         storageAccess.renameResource(oldFile, newName);
         // Création 
         return ResponseEntity.ok(new ResourceResponse("Fichier renommé avec succès", persistedFile.getId()));
+    }
+
+    /**
+     * Renommer un fichier
+     *
+     * @param resourceId
+     * @return
+     */
+    @ApiOperation(value = "Recupérer les informations concernant une ressource")
+    @GetMapping
+    public ResponseEntity<GetResourceResponse> getResource(@RequestParam(required = false) Long resourceId) {
+
+        // id de l'utilisateur connecté
+        Long connectedUserId = authenticationService.getAuthenticatedUser().getId();
+
+        Resource resource;
+        //identifiant de la ressource null
+        if (resourceId == null) {
+            resource = folderResourceService.findUserDefaultFolder(connectedUserId);
+        } else {
+            resource = resourceService.findOne(resourceId);
+        }
+        resource.setId(0);
+        resource.setName("USER_ROOT");
+        GetResourceResponseExtended getResourceResponse = GetResourceResponseExtended.clone( fromResource(resource));
+
+        // dossier parent
+        Resource parent = resource.getResource();
+        getResourceResponse.setParentId((parent != null) ? parent.getId() : null);
+
+        if (resource instanceof FileResource) {
+            // Fichier 
+            getResourceResponse.setResources(null);
+        } else {
+            // Dossier 
+            List<Resource> childResources = (resourceId == null) ? resourceService.findByUserIdAndResourceIsNotNull(connectedUserId) : resourceService.findByUserIdAndResourceId(connectedUserId, resourceId);
+            getResourceResponse.setResources(childResources.parallelStream().map(res -> {
+                return fromResource(res);
+            }).collect(Collectors.toList()));
+        }
+        //
+        return ResponseEntity.ok(getResourceResponse);
+    }
+
+    /**
+     *
+     * @param resource
+     * @return
+     */
+    private GetResourceResponse fromResource(Resource resource) {
+
+        GetResourceResponse resourceWebApiRepresentation = new GetResourceResponse();
+        //identifiant
+        resourceWebApiRepresentation.setId(resource.getId());
+        //nom
+        resourceWebApiRepresentation.setName(resource.getName());
+
+        // taille de la ressource
+        resourceWebApiRepresentation.setSize(resource instanceof FileResource ? ((FileResource) resource).getSize() : null);
+        // type de la ressource
+        resourceWebApiRepresentation.setType(resource instanceof FileResource ? "FILER" : "FOLDR");
+
+        return resourceWebApiRepresentation;
     }
 }

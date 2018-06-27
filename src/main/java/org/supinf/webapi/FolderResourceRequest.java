@@ -11,11 +11,6 @@ import io.swagger.annotations.ApiModelProperty;
 public class FolderResourceRequest {
 
     /**
-     * L'identifiant de l'entité
-     */
-    protected Long id;
-
-    /**
      * Le nom de la resource
      */
     @ApiModelProperty(value = "Nom du dossier")
@@ -26,22 +21,6 @@ public class FolderResourceRequest {
      */
     @ApiModelProperty(value = "Identifiant du dossier parent")
     protected Long parentId;
-
-    /**
-     *
-     * @return
-     */
-    public Long getId() {
-        return id;
-    }
-
-    /**
-     *
-     * @param id
-     */
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     /**
      *
