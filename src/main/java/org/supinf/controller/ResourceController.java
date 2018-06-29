@@ -1,18 +1,27 @@
 package org.supinf.controller;
 
 import io.swagger.annotations.ApiOperation;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -274,7 +283,7 @@ public class ResourceController {
         } else {
             resource = resourceService.findOne(id);
         }
-        GetResourceResponseExtended getResourceResponse = GetResourceResponseExtended.clone( fromResource(resource));
+        GetResourceResponseExtended getResourceResponse = GetResourceResponseExtended.clone(fromResource(resource));
 
         // dossier parent
         Resource parent = resource.getResource();
@@ -313,5 +322,47 @@ public class ResourceController {
         resourceWebApiRepresentation.setType(resource instanceof FileResource ? "FILER" : "FOLDR");
 
         return resourceWebApiRepresentation;
+    }
+
+    @GetMapping("/files/download/{id}")
+    public ResponseEntity<Object> downloadFile(@PathVariable Long id, HttpServletRequest request) {
+        // Load file as Resource
+        Resource resource = fileResourceService.findOne(id);
+
+        // si le fichier n'est pas un PDF
+        String fileName = resource.getName();
+        
+        if (!fileName.endsWith(".pdf")) {
+            
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResourceResponse("ce type de fichier n'est pas encore pris en charge", null));
+        }
+        String fileAbsolutePath = storageAccess.buildResourceAbsolutePath(resource);
+        
+        File file = new File(fileAbsolutePath);
+
+        // Try to determine file's content type
+        String contentType = null;
+
+        contentType = request.getServletContext().getMimeType(file.getAbsolutePath());
+
+        // Fallback to the default content type if type could not be determined
+        if (contentType == null) {
+            contentType = "application/pdf";
+        }
+
+        try {
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getName() + "\"")
+                    .body(new InputStreamResource(new FileInputStream(file)));
+//        return ResponseEntity.ok()
+//                .contentType(MediaType.parseMediaType(contentType))
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getName() + "\"")
+//                .body(file);
+        } catch (FileNotFoundException ex) {
+            java.util.logging.Logger.getLogger(ResourceController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResourceResponse("Impossible de télécharger un dossier", null));
     }
 }
